@@ -11,7 +11,7 @@ output "controller" {
   EOT
 
   value = {
-    user        = local.controller.user
+    user        = var.controller.user
     private_key = local.controller_private_key
     public_key  = local.controller_public_key
     use_agent   = !local.controller_private_key_present
@@ -33,7 +33,7 @@ output "worker" {
   EOT
 
   value = {
-    user        = local.worker.user
+    user        = var.worker.user
     private_key = local.worker_private_key
     public_key  = local.worker_public_key
     use_agent   = !local.controller_private_key_present

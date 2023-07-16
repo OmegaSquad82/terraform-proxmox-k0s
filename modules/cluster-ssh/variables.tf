@@ -22,12 +22,6 @@ variable "controller" {
   }
 }
 
-locals {
-  controller = defaults(var.controller, {
-    gen_key = var.controller.public_key == null
-  })
-}
-
 variable "worker" {
   description = <<-EOT
   The SSH connection details for the worker components.
@@ -44,16 +38,10 @@ variable "worker" {
     user        = string
     private_key = optional(string)
     public_key  = optional(string)
-    gen_key     = optional(bool)
+    gen_key     = optional(bool, true)
   })
 
   default = {
     user = "root"
   }
-}
-
-locals {
-  worker = defaults(var.worker, {
-    gen_key = true
-  })
 }
