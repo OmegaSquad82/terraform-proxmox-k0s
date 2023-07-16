@@ -7,6 +7,9 @@ packages:
 - jq
 - nfs-common
 - open-iscsi
+%{~ for package in packages ~}
+- ${package}
+%{~ endfor ~}
 
 users:
 - name: ${ssh_user}

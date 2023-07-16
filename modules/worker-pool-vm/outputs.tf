@@ -1,7 +1,7 @@
 output "ip_addresses" {
   description = "The IP addresses of the VMs in created in this pool"
 
-  value = [for i in range(var.node_count) : cidrhost(local.network.subnet_cidr, local.network.base_index + i)]
+  value = [for i in range(var.node_count) : cidrhost(var.network.subnet_cidr, var.network.base_index + i)]
 }
 
 output "labels" {

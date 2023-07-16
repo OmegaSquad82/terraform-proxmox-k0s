@@ -1,5 +1,5 @@
 locals {
-  hotplug = concat(["disk", "network", "usb"], local.cpu.numa ? ["memory", "cpu"] : [])
+  hotplug = concat(["disk", "network", "usb"], var.cpu.numa ? ["memory", "cpu"] : [])
 }
 
 resource "proxmox_vm_qemu" "k0s_node" {
@@ -16,28 +16,30 @@ resource "proxmox_vm_qemu" "k0s_node" {
     <em>Managed by Terraform</em>
   EOT
 
-  name = "k0s-${var.cluster_name}-${var.name}-${count.index}"
+  name = "k0s-${var.cluster_name}-wrk-${var.name}-${count.index}"
 
   pool        = var.pve.pool
   target_node = var.pve.node
   vmid        = try(var.pve.base_vmid + count.index, null)
 
-  clone                   = local.os.template
-  full_clone              = !local.os.linked
+  clone                   = var.os.template
+  full_clone              = !var.os.linked
   os_type                 = "cloud-init"
   cicustom                = "user=${proxmox_virtual_environment_file.cloud_init[count.index].id}"
-  cloudinit_cdrom_storage = local.os.storage.cdrom
+  cloudinit_cdrom_storage = var.os.storage.cdrom
   ciuser                  = var.ssh.user
   sshkeys                 = var.ssh.public_key
+  bios                    = var.bios
+  qemu_os                 = var.qemu_os
 
   agent = var.agent_enabled ? 1 : 0
 
-  cpu     = local.cpu.type
-  cores   = local.cpu.cores
-  sockets = local.cpu.sockets
-  numa    = local.cpu.numa
-  memory  = local.memory.megabytes
-  balloon = local.memory.balloon
+  cpu     = var.cpu.type
+  cores   = var.cpu.cores
+  sockets = var.cpu.sockets
+  numa    = var.cpu.numa
+  memory  = var.memory.megabytes
+  balloon = var.memory.balloon != null ? var.memory.balloon : var.memory.megabytes
   hotplug = join(",", local.hotplug)
   onboot  = true
 
@@ -51,11 +53,12 @@ resource "proxmox_vm_qemu" "k0s_node" {
     type = "socket"
   }
 
-  ipconfig0 = "ip=${cidrhost(local.network.subnet_cidr, local.network.base_index + count.index)}/${split("/", local.network.cidr)[1]},gw=${local.network.gateway}"
+  ipconfig0 = "ip=${cidrhost(var.network.subnet_cidr, var.network.base_index + count.index)}/${split("/", var.network.cidr)[1]},gw=${var.network.gateway}"
 
   network {
-    model  = local.network.driver
-    bridge = local.network.bridge
+    model  = var.network.driver
+    bridge = var.network.bridge
+    tag    = var.network.tag
   }
 
   scsihw = "virtio-scsi-pci"
@@ -79,5 +82,12 @@ resource "proxmox_vm_qemu" "k0s_node" {
       format  = "raw"
       discard = "on"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      pool,
+      tags,
+    ]
   }
 }

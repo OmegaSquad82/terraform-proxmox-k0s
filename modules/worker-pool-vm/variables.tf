@@ -44,6 +44,7 @@ variable "os" {
   * template - The VM template to clone
   * linked - Whether to create a linked clone; default false
   * upgrade - Whether to perform package upgrades during cloud-init; default false
+  * packages - Packages installed on top of requirements (see cloud-init.yaml.tftmpl)
   * storage -
      * cdrom - The proxmox storage pool for the cloud-init CD-ROM volume
      * snippet - The proxmox storage pool for the cloud-init contents
@@ -51,8 +52,9 @@ variable "os" {
 
   type = object({
     template = string
-    linked   = optional(bool)
-    upgrade  = optional(bool)
+    linked   = optional(bool, false)
+    upgrade  = optional(bool, false)
+    packages = optional(list(string), [])
     storage = object({
       cdrom   = string
       snippet = string
@@ -60,11 +62,26 @@ variable "os" {
   })
 }
 
-locals {
-  os = defaults(var.os, {
-    linked  = false
-    upgrade = false
-  })
+variable "bios" {
+  description = <<-EOT
+  The VM BIOS and UEFI system configuration.
+  See the proxmox documentation for more information.
+
+  EOT
+
+  type    = string
+  default = "seabios"
+}
+
+variable "qemu_os" {
+  description = <<-EOT
+  The VM operating system configuration.
+  See the proxmox documentation for more information.
+
+  EOT
+
+  type    = string
+  default = "l26"
 }
 
 variable "cpu" {
@@ -80,22 +97,14 @@ variable "cpu" {
 
   type = object({
     cores   = number
-    sockets = optional(number)
-    type    = optional(string)
-    numa    = optional(bool)
+    sockets = optional(number, 1)
+    type    = optional(string, "host")
+    numa    = optional(bool, false)
   })
 
   default = {
     cores = 2
   }
-}
-
-locals {
-  cpu = defaults(var.cpu, {
-    type    = "host"
-    sockets = 1
-    numa    = false
-  })
 }
 
 variable "agent_enabled" {
@@ -127,12 +136,6 @@ variable "memory" {
   }
 }
 
-locals {
-  memory = defaults(var.memory, {
-    balloon = var.memory.megabytes
-  })
-}
-
 variable "network" {
   description = <<-EOT
   The network configuration for each VM.
@@ -144,22 +147,17 @@ variable "network" {
   * subnet_cidr - The CIDR block for allocating IP addresses for each VM
   * base_index - The index into the CIDR block to allocate to first VM; increments to node_count; default 0
   * gateway - The gateway IP on the network
+  * tag - The VLAN tag for this interface
   EOT
 
   type = object({
-    driver      = optional(string)
+    driver      = optional(string, "virtio")
     bridge      = string
     cidr        = string
     subnet_cidr = string
-    base_index  = optional(number)
+    base_index  = optional(number, 0)
     gateway     = string
-  })
-}
-
-locals {
-  network = defaults(var.network, {
-    driver     = "virtio"
-    base_index = 0
+    tag         = optional(number)
   })
 }
 

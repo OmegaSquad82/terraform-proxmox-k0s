@@ -5,11 +5,9 @@ terraform {
     }
 
     proxmox-resource = {
-      source = "danitso/proxmox"
+      source = "bpg/proxmox"
     }
   }
 
-  required_version = ">= 1.0.0"
-
-  experiments = [module_variable_optional_attrs]
+  required_version = ">= 1.3.0"
 }
