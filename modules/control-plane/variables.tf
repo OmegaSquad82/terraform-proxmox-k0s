@@ -41,14 +41,8 @@ variable "os" {
 
   type = object({
     template = string
-    linked   = optional(bool)
+    linked   = optional(bool, true)
     type     = optional(string)
-  })
-}
-
-locals {
-  os = defaults(var.os, {
-    linked = true
   })
 }
 
@@ -87,19 +81,12 @@ variable "cpu" {
   type = object({
     cores = number
     limit = optional(number)
-    units = optional(number)
+    units = optional(number, 1024)
   })
 
   default = {
     cores = 2
   }
-}
-
-locals {
-  cpu = defaults(var.cpu, {
-    limit = var.cpu.cores
-    units = 1024
-  })
 }
 
 variable "memory" {
@@ -113,18 +100,12 @@ variable "memory" {
 
   type = object({
     megabytes = number
-    swap      = optional(number)
+    swap      = optional(number, 512)
   })
 
   default = {
     megabytes = 1024
   }
-}
-
-locals {
-  memory = defaults(var.memory, {
-    swap = 512
-  })
 }
 
 variable "network" {
@@ -138,22 +119,17 @@ variable "network" {
   * subnet_cidr - The CIDR block for allocating IP addresses for each VM
   * base_index - The index into the CIDR block to allocate to first VM; increments to node_count; default 0
   * gateway - The gateway IP on the network
+  * tag - The VLAN tag for this interface
   EOT
 
   type = object({
-    name        = optional(string)
+    name        = optional(string, "eth0")
     bridge      = string
     cidr        = string
     subnet_cidr = string
-    base_index  = optional(number)
+    base_index  = optional(number, 0)
     gateway     = string
-  })
-}
-
-locals {
-  network = defaults(var.network, {
-    name       = "eth0"
-    base_index = 0
+    tag         = optional(number)
   })
 }
 
@@ -167,14 +143,8 @@ variable "root_disk" {
   EOT
 
   type = object({
-    size    = optional(string)
+    size    = optional(string, "10G")
     storage = string
-  })
-}
-
-locals {
-  root_disk = defaults(var.root_disk, {
-    size = "10G"
   })
 }
 
