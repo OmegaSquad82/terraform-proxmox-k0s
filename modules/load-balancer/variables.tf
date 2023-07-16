@@ -34,14 +34,8 @@ variable "os" {
 
   type = object({
     template = string
-    linked   = optional(bool)
+    linked   = optional(bool, true)
     type     = optional(string)
-  })
-}
-
-locals {
-  os = defaults(var.os, {
-    linked = true
   })
 }
 
@@ -73,7 +67,7 @@ variable "cpu" {
   type = object({
     cores = number
     limit = optional(number)
-    units = optional(number)
+    units = optional(number, 1024)
   })
 
   default = {
@@ -81,36 +75,23 @@ variable "cpu" {
   }
 }
 
-locals {
-  cpu = defaults(var.cpu, {
-    limit = var.cpu.cores
-    units = 1024
-  })
-}
-
 variable "memory" {
   description = <<-EOT
   The memory configuration for each VM.
   See the proxmox documentation for more information.
 
-  * megabytes - Pretty obvious; default 1024 MB
-  * swap - How much swap space to allocate; default 512 MB
+  * megabytes - Pretty obvious; default 256 MB
+  * swap - How much swap space to allocate; default 128 MB
   EOT
 
   type = object({
     megabytes = number
-    swap      = optional(number)
+    swap      = optional(number, 128)
   })
 
   default = {
     megabytes = 256
   }
-}
-
-locals {
-  memory = defaults(var.memory, {
-    swap = 128
-  })
 }
 
 variable "network" {
@@ -124,20 +105,16 @@ variable "network" {
   * subnet_cidr - The CIDR block for allocating IP addresses for each VM
   * base_index - The index into the CIDR block to allocate to first VM; increments to node_count; default 0
   * gateway - The gateway IP on the network
+  * tag - The VLAN tag for this interface
   EOT
 
   type = object({
-    name    = optional(string)
+    name    = optional(string, "eth0")
     bridge  = string
     cidr    = string
     ip      = string
     gateway = string
-  })
-}
-
-locals {
-  network = defaults(var.network, {
-    name = "eth0"
+    tag     = optional(number)
   })
 }
 
@@ -151,14 +128,8 @@ variable "root_disk" {
   EOT
 
   type = object({
-    size    = optional(string)
+    size    = optional(string, "10G")
     storage = string
-  })
-}
-
-locals {
-  root_disk = defaults(var.root_disk, {
-    size = "10G"
   })
 }
 

@@ -11,9 +11,9 @@ resource "proxmox_lxc" "load_balancer" {
 
   hostname = "k0s-${var.cluster_name}-lb"
 
-  ostemplate   = local.os.template
-  full         = !local.os.linked
-  ostype       = local.os.type
+  ostemplate   = var.os.template
+  full         = !var.os.linked
+  ostype       = var.os.type
   unprivileged = true
 
   pool        = var.pve.pool
@@ -22,11 +22,11 @@ resource "proxmox_lxc" "load_balancer" {
   hastate     = var.ha.state
   hagroup     = var.ha.group
 
-  cores    = local.cpu.cores
-  cpulimit = local.cpu.limit
-  cpuunits = local.cpu.units
-  memory   = local.memory.megabytes
-  swap     = local.memory.swap
+  cores    = var.cpu.cores
+  cpulimit = var.cpu.limit != null ? var.cpu.limit : var.cpu.cores
+  cpuunits = var.cpu.units
+  memory   = var.memory.megabytes
+  swap     = var.memory.swap
 
   start  = true
   onboot = true
@@ -36,15 +36,16 @@ resource "proxmox_lxc" "load_balancer" {
   ssh_public_keys = var.ssh.public_key
 
   rootfs {
-    storage = local.root_disk.storage
-    size    = local.root_disk.size
+    storage = var.root_disk.storage
+    size    = var.root_disk.size
   }
 
   network {
-    name   = local.network.name
-    bridge = local.network.bridge
-    ip     = "${local.network.ip}/${split("/", local.network.cidr)[1]}"
-    gw     = local.network.gateway
+    name   = var.network.name
+    bridge = var.network.bridge
+    ip     = "${var.network.ip}/${split("/", var.network.cidr)[1]}"
+    gw     = var.network.gateway
+    tag    = var.network.tag
   }
 
   provisioner "remote-exec" {
@@ -53,7 +54,7 @@ resource "proxmox_lxc" "load_balancer" {
     ]
 
     connection {
-      host        = local.network.ip
+      host        = var.network.ip
       type        = "ssh"
       user        = var.ssh.user
       private_key = var.ssh.private_key
@@ -69,7 +70,7 @@ resource "proxmox_lxc" "load_balancer" {
     })
 
     connection {
-      host        = local.network.ip
+      host        = var.network.ip
       type        = "ssh"
       user        = var.ssh.user
       private_key = var.ssh.private_key
@@ -84,7 +85,7 @@ resource "proxmox_lxc" "load_balancer" {
     ]
 
     connection {
-      host        = local.network.ip
+      host        = var.network.ip
       type        = "ssh"
       user        = var.ssh.user
       private_key = var.ssh.private_key

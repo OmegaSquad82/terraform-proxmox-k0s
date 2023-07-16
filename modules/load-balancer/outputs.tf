@@ -14,6 +14,6 @@ output "external_api" {
 
   value = {
     address = local.external_api_address
-    sans    = compact([var.dns_name, local.network.ip])
+    sans    = compact([var.dns_name, var.network.ip])
   }
 }
