@@ -14,7 +14,7 @@ module "control_plane" {
   }
 
   os = {
-    template = "vm-sources:vztmpl/ubuntu-20.04-standard_20.04-1_amd64.tar.gz"
+    template = "vm-sources:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   }
 
   network = {
@@ -39,7 +39,7 @@ module "worker_pool" {
   }
 
   os = {
-    template = "ubuntu2004-templ"
+    template = "ubuntu2204-templ"
     storage = {
       cdrom   = "vms"
       snippet = "snippets"
@@ -82,8 +82,8 @@ module "cluster" {
   local_storage = "${abspath(path.module)}/generated"
 
   k0sctl = {
-    version     = "v0.13.1"
-    k0s_version = "v1.24.2+k0s.0"
+    version     = "v0.15.2"
+    k0s_version = "v1.27.3+k0s.0"
   }
 
   pod_cidr     = "10.244.0.0/16"

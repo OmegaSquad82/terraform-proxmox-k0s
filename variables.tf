@@ -29,13 +29,7 @@ variable "k0sctl" {
     version     = string
     k0s_version = string
     k0s_binary  = optional(string)
-    telemetry   = optional(bool)
-  })
-}
-
-locals {
-  k0sctl = defaults(var.k0sctl, {
-    telemetry = false
+    telemetry   = optional(bool, false)
   })
 }
 
@@ -108,7 +102,7 @@ variable "worker_pools" {
 
 variable "pod_cidr" {
   description = "The CIDR block from which pod IP addresses will be assigned"
-  
+
   type = string
 }
 

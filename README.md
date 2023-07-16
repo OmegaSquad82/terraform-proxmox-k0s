@@ -10,19 +10,19 @@ There are a number of sub-modules used for configuring a complete cluster.
 * [worker-pool-vm](modules/worker-pool-vm/) - QEMU VM based worker pool configuration
 
 ## Providers
-These modules make use of the [telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox) and [danitso/proxmox](https://registry.terraform.io/providers/danitso/proxmox) providers.
-Since they're both named `proxmox`, the `danitso/proxmox` provider has been aliased to `proxmox-resource` because it's only used for creating snippets, etc.
+These modules make use of the [telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox) and [bpg/proxmox](https://registry.terraform.io/providers/bpg/proxmox) providers.
+Since they're both named `proxmox`, the `bpg/proxmox` provider has been aliased to `proxmox-resource` because it's only used for creating snippets, etc.
 The `telmate/proxmox` provider is used for the management of containers and VMs.
 
 ## Compatibility
-This module is meant for use with Terraform 1.0+ and tested using Terraform 1.0.
+This module is meant for use with Terraform 1.3+ and tested using Terraform v1.3.0 and 1.5.x; 
 If you find incompatibilities, please open an issue.
-This has been tested with Proxmox 6.4, 7.1, and 7.2 but not all features have been tested with all listed versions of proxmox.
+This has been tested with Proxmox 8.0.3 but not all features have been tested with all listed versions of proxmox.
 
 ## Caveats
 
 ### Providers
-Some modules make use of [danitso/proxmox](https://registry.terraform.io/providers/danitso/proxmox) ([GitHub](https://github.com/danitso/terraform-provider-proxmox)) specifically for writing cloud-init snippets for QEMU VMs.
+Some modules make use of [bpg/proxmox](https://registry.terraform.io/providers/bpg/proxmox) ([GitHub](https://github.com/bpg/terraform-provider-proxmox)) specifically for writing cloud-init snippets for QEMU VMs.
 This provider appears to be...not currently maintained.
 Testing has revealed that snippet resources, and posibly the resulting CDROM volumes, might not be properly destroyed.
 These might require deletion after a `terraform destroy` for a complete cleanup.

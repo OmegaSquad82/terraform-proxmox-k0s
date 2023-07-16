@@ -6,8 +6,8 @@ terraform {
     }
 
     proxmox-resource = {
-      source  = "danitso/proxmox"
-      version = "~> 0.4.4"
+      source  = "bpg/proxmox"
+      version = "~> 0.24.0"
     }
   }
 }

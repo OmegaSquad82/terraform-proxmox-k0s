@@ -1,6 +1,6 @@
 resource "null_resource" "k0sctl_apply" {
   triggers = {
-    on_version_change = local.k0sctl.version
+    on_version_change = var.k0sctl.version
     on_config_change  = data.local_file.k0sctl_yaml.content_base64
   }
 

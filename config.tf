@@ -3,7 +3,7 @@ locals {
   k0sctl_config_path = "${var.local_storage}/k0sctl.yaml"
   kube_config_path   = "${var.local_storage}/kube-config"
 
-  telemetry_flag = local.k0sctl.telemetry ? "" : "--disable-telemetry"
+  telemetry_flag = var.k0sctl.telemetry ? "" : "--disable-telemetry"
 
   worker_pools = [for pool in var.worker_pools : {
     ip_addresses = pool.ip_addresses
@@ -18,7 +18,7 @@ locals {
 resource "local_file" "k0sctl_yaml" {
   filename = local.k0sctl_config_path
   content = templatefile("${path.module}/templates/k0sctl.yaml.tftpl", {
-    binary_path = local.k0sctl.k0s_binary
+    binary_path = var.k0sctl.k0s_binary
 
     controller_ips       = var.control_plane.ip_addresses
     controller_user      = var.ssh.controller.user
@@ -31,7 +31,7 @@ resource "local_file" "k0sctl_yaml" {
     worker_ssh_key   = var.ssh.controller.use_agent ? "" : local_sensitive_file.worker_ssh_pk[0].filename
 
     cluster_name = var.name
-    k0s_version  = local.k0sctl.k0s_version
+    k0s_version  = var.k0sctl.k0s_version
     api_sans     = try(distinct(var.control_plane.external_api.sans), [])
     api_address  = try(var.control_plane.external_api.address, "")
     pod_cidr     = var.pod_cidr
@@ -49,11 +49,11 @@ data "local_file" "k0sctl_yaml" {
 
 resource "null_resource" "k0sctl_executable" {
   triggers = {
-    on_version_change = local.k0sctl.version
+    on_version_change = var.k0sctl.version
   }
 
   provisioner "local-exec" {
-    command = "wget -O ${local.k0sctl_exe_path} https://github.com/k0sproject/k0sctl/releases/download/${local.k0sctl.version}/k0sctl-linux-x64 && chmod +x ${local.k0sctl_exe_path}"
+    command = "mkdir -p ${var.local_storage} && wget -O ${local.k0sctl_exe_path} https://github.com/k0sproject/k0sctl/releases/download/${var.k0sctl.version}/k0sctl-linux-x64 && chmod +x ${local.k0sctl_exe_path}"
   }
 
   # │ Error: Invalid reference from destroy provisioner
@@ -73,7 +73,7 @@ resource "null_resource" "k0sctl_executable" {
 
 resource "null_resource" "kube_config" {
   triggers = {
-    on_version_change = local.k0sctl.version
+    on_version_change = var.k0sctl.version
     on_config_change  = data.local_file.k0sctl_yaml.content_base64
   }
 
