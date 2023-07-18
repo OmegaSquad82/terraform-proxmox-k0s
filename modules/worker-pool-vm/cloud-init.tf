@@ -7,9 +7,9 @@ resource "proxmox_virtual_environment_file" "cloud_init" {
   node_name    = var.pve.node
 
   source_raw {
-    file_name = "k0s-${var.cluster_name}-${var.name}-${count.index}-cloud-init.yaml"
+    file_name = "k0s-${var.cluster_name}-wrk-${var.name}-${count.index}-cloud-init.yaml"
     data = templatefile("${path.module}/templates/cloud-init.yaml.tftpl", {
-      hostname    = "k0s-${var.cluster_name}-${var.name}-${count.index}"
+      hostname    = "k0s-${var.cluster_name}-wrk-${var.name}-${count.index}"
       upgrade     = var.os.upgrade
       packages    = var.os.packages
       ssh_user    = var.ssh.user
