@@ -90,4 +90,10 @@ resource "proxmox_vm_qemu" "k0s_node" {
       tags,
     ]
   }
+
+  provisioner "local-exec" {
+    when       = destroy
+    on_failure = continue
+    command    = "ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${self.default_ipv4_address}"
+  }
 }

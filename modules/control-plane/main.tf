@@ -55,6 +55,12 @@ resource "proxmox_lxc" "controller" {
       target_node,
     ]
   }
+
+  provisioner "local-exec" {
+    when       = destroy
+    on_failure = continue
+    command    = "ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${split("/", self.network[0].ip)[0]}"
+  }
 }
 
 resource "random_password" "root_password" {
