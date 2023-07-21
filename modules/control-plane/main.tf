@@ -58,8 +58,7 @@ resource "proxmox_lxc" "controller" {
 
   provisioner "local-exec" {
     when       = destroy
-    on_failure = continue
-    command    = "ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${split("/", self.network[0].ip)[0]}"
+    command    = "sleep $(( $RANDOM % 10 ))s && ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${split("/", self.network[0].ip)[0]}"
   }
 }
 

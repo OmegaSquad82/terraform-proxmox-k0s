@@ -93,7 +93,6 @@ resource "proxmox_vm_qemu" "k0s_node" {
 
   provisioner "local-exec" {
     when       = destroy
-    on_failure = continue
-    command    = "ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${self.default_ipv4_address}"
+    command    = "sleep $(( $RANDOM % 10 ))s && ssh-keygen -f ${pathexpand("~/.ssh/known_hosts")} -R ${self.default_ipv4_address}"
   }
 }
